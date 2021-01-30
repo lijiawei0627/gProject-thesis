@@ -274,7 +274,10 @@ export default {
     },
     loop () {
       this.$refs.audio.currentTime = 0
-      this.$refs.audio.play()
+      this.$refs.audio.load()
+      setTimeout(() => {
+        this.$refs.audio.play()
+      }, 200)
       this.setPlayingState(true)
       // 循环播放时，歌曲播放完毕，歌词回到第一行
       if (this.currentLyric) {
@@ -331,7 +334,10 @@ export default {
         }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
-          this.currentLyric.play()
+          this.currentLyric.load()
+          setTimeout(() => {
+            this.currentLyric.play()
+          }, 200)
         }
       }).catch(() => {
         this.currentLyric = null
@@ -527,7 +533,10 @@ export default {
         this.currentLineNum = 0
       }
       this.$refs.audio.src = newSong.url
-      this.$refs.audio.play()
+      this.$refs.audio.load()
+      setTimeout(() => {
+        this.$refs.audio.play()
+      }, 200)
       clearTimeout(this.timer)
       // 若歌曲 5s 未播放，则认为超时，修改状态确保可以切换歌曲。
       this.timer = setTimeout(() => {
@@ -541,6 +550,7 @@ export default {
       }
       const audio = this.$refs.audio
       this.$nextTick(() => {
+        audio.load()
         newPlaying ? audio.play() : audio.pause()
       })
       if (!newPlaying) {
