@@ -334,10 +334,7 @@ export default {
         }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
-          this.currentLyric.load()
-          setTimeout(() => {
-            this.currentLyric.play()
-          }, 200)
+          this.currentLyric.play()
         }
       }).catch(() => {
         this.currentLyric = null
