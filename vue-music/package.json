@@ -2,7 +2,7 @@
   "name": "vue-music",
   "version": "1.0.0",
   "description": "a music app",
-  "author": "ruxin <17826833736@163.com>",
+  "author": "lijiawei <1472406718@qq.com>",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",

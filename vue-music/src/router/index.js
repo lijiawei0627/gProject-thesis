@@ -9,6 +9,7 @@ const SingerDetail = () => import('components/singer-detail/singer-detail')
 const Disc = () => import('components/disc/disc')
 const TopList = () => import('components/top-list/top-list')
 const UserCenter = () => import('components/user-center/user-center')
+const UserLogin = () => import('components/user-login/user-login')
 
 Vue.use(Router)
 // 解决重复点击路由会报错的问题
@@ -17,7 +18,7 @@ Router.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-export default new Router({
+const router = new Router({
   routes: [
     {path: '/', redirect: '/recommend'},
     { path: '/recommend',
@@ -44,6 +45,17 @@ export default new Router({
         {path: ':id', component: SingerDetail}
       ]
     },
-    {path: '/user', component: UserCenter}
+    {
+      path: '/user',
+      component: UserCenter,
+      beforeEnter: (to, from, next) => {
+        // 用户权限设定
+        const isLogin = localStorage.isLogin
+        isLogin ? next() : next('/login')
+      }
+    },
+    {path: '/login', component: UserLogin}
   ]
 })
+
+export default router
