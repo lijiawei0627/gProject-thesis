@@ -8,6 +8,23 @@ function resolve (dir) {
 
 module.exports = {
   devServer: {
+    open: true,
+    host: 'localhost',
+    port: 8080,
+    https: false,
+    hotOnly: false,
+    proxy: {
+      '/api': {
+        // 配置代理
+        //对应自己后端应用服务的接口
+        target: 'http://localhost:3000/api', 
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    },
     before (app) {
       app.get('/api/getDiscList', function (req, res) {
         const url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'

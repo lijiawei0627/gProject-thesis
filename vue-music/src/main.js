@@ -5,6 +5,7 @@ import router from './router'
 import fastclick from 'fastclick'
 import VueLazyload from 'vue-lazyload'
 import store from './store'
+import axios from 'axios'
 import 'common/stylus/index.styl'
 
 // 整个body中的按钮点击都不会再有300ms的延时
@@ -13,6 +14,7 @@ fastclick.attach(document.body)
 Vue.use(VueLazyload, {
   loading: require('common/image/default.png')
 })
+Vue.prototype.$axios = axios
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

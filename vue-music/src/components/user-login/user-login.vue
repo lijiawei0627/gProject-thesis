@@ -5,7 +5,7 @@
     </div>
     <div class="userInfo">
       <div class="id">
-          <input name="ID" type="text" placeholder="支持QQ号/邮箱/手机号登录" v-model="userName">
+          <input name="ID" type="text" placeholder="支持QQ号/邮箱/手机号登录" v-model="username">
       </div>
       <div class="pasw">
           <input name="password" type="password" placeholder="密码" v-model="password">
@@ -22,32 +22,32 @@
 </template>
 
 <script type="text/ecmascript-6">
-import axios from 'axios'
+// import axios from 'axios'
 export default {
   data () {
     return {
       subType: '登录',
-      userName: '',
+      username: '',
       password: ''
     }
   },
   methods: {
     sub: function () {
-      let url = 'http://127.0.0.1:5000'
+      let url = '/api/user'
       url += this.subType === '登录' ? '/login' : '/register'
       const formData = {
-        userName: this.userName,
+        username: this.username,
         password: this.password
       }
-      axios.post(url, formData)
+      this.$axios.post(url, formData)
         .then(this.getResponse)
     },
     getResponse: function (res) {
-
+      console.log(res)
     },
     change: function () {
       this.subType = this.subType === '登录' ? '注册' : '登录'
-      this.userName = ''
+      this.username = ''
       this.password = ''
     }
   }
