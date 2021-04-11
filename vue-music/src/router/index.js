@@ -9,7 +9,7 @@ const SingerDetail = () => import('components/singer-detail/singer-detail')
 const Disc = () => import('components/disc/disc')
 const TopList = () => import('components/top-list/top-list')
 const UserCenter = () => import('components/user-center/user-center')
-const UserLogin = () => import('components/user-login/user-login')
+const UserLogin = () => import('components/user-login/user-login1')
 
 Vue.use(Router)
 // 解决重复点击路由会报错的问题

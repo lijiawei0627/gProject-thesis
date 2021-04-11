@@ -1,6 +1,7 @@
 // 建立返回数据的模型
 class BaseModel {
   constructor (data, message) {
+    console.log(data)
     if (typeof data === 'string') {
       this.message = data
       data = null

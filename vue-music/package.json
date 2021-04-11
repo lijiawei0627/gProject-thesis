@@ -16,6 +16,7 @@
     "better-scroll": "^1.6.0",
     "compression": "^1.7.4",
     "create-keyframe-animation": "^0.1.0",
+    "element-ui": "^2.15.1",
     "express": "^4.17.1",
     "fastclick": "^1.0.6",
     "good-storage": "^1.1.1",

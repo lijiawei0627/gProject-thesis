@@ -23,6 +23,13 @@ const ENV = process.env.NODE_ENV
 if (ENV !== 'production') {
   // 开发环境
   app.use(logger('dev'));
+  const logFileName = path.join(__dirname, 'logs', 'access.log')
+  const writeStream = fs.createWriteStream(logFileName, {
+    flags: 'a'  // 追加内容，而非覆盖
+  })
+  app.use(logger('combined', {
+    stream: writeStream  // 将日志写入到access.log文件中
+  }))
 } else {
   // 线上环境
   const logFileName = path.join(__dirname, 'logs', 'access.log')

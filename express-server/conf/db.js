@@ -10,7 +10,7 @@ if (env === 'dev') {
     host: "localhost",
     user: "root",
     password: "123654",
-    database: "myblog"
+    database: "mymusic"
   }
 
   // redis

@@ -22,7 +22,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-// import axios from 'axios'
+import axios from 'axios'
 export default {
   data () {
     return {
@@ -39,14 +39,70 @@ export default {
         username: this.username,
         password: this.password
       }
-      this.$axios.post(url, formData)
-        .then(this.getResponse)
+      axios.post(url, formData)
+        .then(this.getResponse, (err) => {
+          this.$message({
+            message: '请求错误',
+            type: 'error'
+          })
+          console.log(err)
+        })
+        .catch((a) => {
+          console.log(a)
+        })
     },
     getResponse: function (res) {
-      console.log(res)
+      const data = res.data
+      if (data.errno === -1) {
+        this.$message({
+          message: data.errorInfo || data.message,
+          type: 'error',
+          center: true
+        })
+      } else if (data.errno === 0) {
+        this.handle(data)
+      }
+    },
+    handle: function (data) {
+      this.$confirm(data.message, '', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        center: true
+      })
+        .then(() => {
+          if (this.subType === '登录') {
+            this.$router.push('/recommend')
+            localStorage.isLogin = true
+          } else {
+            this.subType = '登录'
+            this.clearInput()
+          }
+        })
+        .catch(action => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+      // this.$alert(data.message, '', {
+      //   confirmButtonText: '确定',
+      //   callback: action => {
+      //     if (this.subType === '登录') {
+      //       this.$router.push('/recommend')
+      //       localStorage.isLogin = true
+      //     } else {
+      //       this.subType = '登录'
+      //       this.clearInput()
+      //     }
+      //   }
+      // })
     },
     change: function () {
       this.subType = this.subType === '登录' ? '注册' : '登录'
+      this.clearInput()
+    },
+    clearInput: function () {
       this.username = ''
       this.password = ''
     }

@@ -197,15 +197,22 @@ export default {
         this.currentLyric.togglePlay()
       }
     },
-    // 播放下一首
-    next () {
+    // 播放下一首/随机播放
+    next (random) {
       // 若歌曲没有准备好，则直接return
       if (!this.songReady) return
       // 当歌曲列表长度为1时，循环播放
       if (this.playlist.length === 1) {
         this.loop()
       } else {
-        let index = this.currentIndex + 1
+        let index
+        if (random === true) {
+          index = Math.round(Math.random() * this.playlist.length)
+          index === this.currentIndex && index++
+        } else {
+          index = this.currentIndex + 1
+        }
+        // let index = this.currentIndex + 1
         if (index === this.playlist.length) {
           index = 0
         }
@@ -263,13 +270,15 @@ export default {
     open () {
       this.setFullScreen(true)
     },
-    // 歌曲播放结束后，根据当前播放模式，选择循环播放或是播放下一首
+    // 歌曲播放结束后，根据当前播放模式，选择循环播放、随机播放或是播放下一首
     end () {
       this.currentTime = 0
       if (this.mode === playMode.loop) {
         this.loop()
-      } else {
+      } else if (this.mode === playMode.sequence) {
         this.next()
+      } else {
+        this.next(true)
       }
     },
     loop () {
@@ -285,6 +294,10 @@ export default {
       }
     },
     updateTime (e) {
+      // 监听end事件失效，暂时使用该方法解决
+      if (e.target.currentTime === this.currentSong.duration) {
+        this.end()
+      }
       this.currentTime = e.target.currentTime
     },
     format (interval) {

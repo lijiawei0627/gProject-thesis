@@ -1,24 +1,42 @@
-const { login } = require('../controller/user')
+const { login, register } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 var express = require('express');
+const { object } = require('../db/redis');
 var router = express.Router();
 
 router.post('/login', function(req, res, next) {
-  console.log(req.body)
   const { username, password } = req.body
   const result = login(username, password)
   result.then(data => {
-    console.log(data)
     if (data.username) {
 
       // 设置session
       req.session.username = data.username
       req.session.realname = data.realname
 
-      res.json(new SuccessModel(data))
+      res.json(new SuccessModel(data, '登录成功'))
       return
     }
-    res.json(new ErrorModel('登录失败'))
+    const errRes = Object.assign(new ErrorModel('登录失败'), data)
+    res.json(errRes)
+  })
+});
+
+router.post('/register', function(req, res, next) {
+  const { username, password } = req.body
+  const result = register(username, password)
+  result.then(data => {
+    if (data.successInfo) {
+
+      // 设置session
+      // req.session.username = data.username
+      // req.session.realname = data.realname
+
+      res.json(new SuccessModel(data.successInfo))
+      return
+    }
+    const errRes = Object.assign(new ErrorModel(data.errorInfo))
+    res.json(errRes)
   })
 });
 

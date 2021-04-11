@@ -12,7 +12,7 @@
         <span class="text">随机播放全部</span>
       </div>
       <div class="list-wrapper" ref="listWrapper">
-        <!-- 我喜欢的 -->
+        <!-- 收藏列表 -->
         <scroll ref="favoriteList" class="list-scroll" v-if="currentIndex===0" :data="favoriteList">
           <div class="list-inner">
             <song-list :songs="favoriteList" @select="selectSong"></song-list>
@@ -47,7 +47,7 @@ export default {
       currentIndex: 0,
       switches: [
         {
-          name: '我喜欢的'
+          name: '收藏列表'
         },
         {
           name: '最近播放'

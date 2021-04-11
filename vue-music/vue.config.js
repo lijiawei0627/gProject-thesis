@@ -170,6 +170,7 @@ module.exports = {
       .set('common', resolve('src/common'))
       .set('api', resolve('src/api'))
       .set('base', resolve('src/base'))
+      .set('static', resolve('src/static'))
   },
   publicPath: ''
 }
