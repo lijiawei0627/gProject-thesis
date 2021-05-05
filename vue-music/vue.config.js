@@ -172,5 +172,10 @@ module.exports = {
       .set('base', resolve('src/base'))
       .set('static', resolve('src/static'))
   },
-  publicPath: ''
+  publicPath: '',
+  configureWebpack: {
+    externals: {
+      AMap: 'AMap'
+    }
+  }
 }

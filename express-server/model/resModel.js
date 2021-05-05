@@ -29,7 +29,15 @@ class ErrorModel extends BaseModel {
   }
 }
 
+class OtherModel extends BaseModel {
+  constructor (data, message) {
+    super(data, message)
+    this.errno = 1
+  }
+}
+
 module.exports = {
   SuccessModel,
-  ErrorModel
+  ErrorModel,
+  OtherModel
 }

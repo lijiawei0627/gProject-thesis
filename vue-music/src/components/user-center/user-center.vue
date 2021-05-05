@@ -55,6 +55,10 @@ export default {
       ]
     }
   },
+  // created: function () {
+  //   console.log(this.favoriteList)
+  //   console.log(this.playHistory)
+  // },
   computed: {
     noResult () {
       if (this.currentIndex === 0) {

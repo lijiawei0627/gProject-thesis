@@ -10,6 +10,7 @@ const redisClient = require('./db/redis')
 
 const blogRouter = require('./routes/blog')
 const userRouter = require('./routes/user')
+const codeRouter = require('./routes/verificationCode')
 
 // 初始化app实例
 var app = express();
@@ -72,6 +73,7 @@ app.use(session({
 // 注册路由
 app.use('/api/blog', blogRouter);
 app.use('/api/user', userRouter);
+app.use('/api/code', codeRouter);
 
 // catch 404 and forward to error handler
 // 如果找不到定义的路由,则404处理

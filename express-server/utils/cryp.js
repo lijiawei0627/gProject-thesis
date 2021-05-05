@@ -1,4 +1,3 @@
-// 秘钥
 const crypto = require('crypto')
 
 // 密钥

@@ -7,6 +7,7 @@ import VueLazyload from 'vue-lazyload'
 import store from './store'
 import axios from 'axios'
 import ElementUI from 'element-ui'
+import {getPosition} from 'api/amap'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'common/stylus/index.styl'
 
@@ -19,6 +20,10 @@ Vue.use(VueLazyload, {
 })
 Vue.prototype.$axios = axios
 Vue.config.productionTip = false
+// 获取定位信息
+getPosition().then(function (result) {
+  localStorage.setItem('positionInfo', JSON.stringify(result))
+})
 
 /* eslint-disable no-new */
 new Vue({

@@ -4,24 +4,38 @@
       感受阳光，给予希望
     </div>
     <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="0px" class="userInfo">
-      <el-form-item prop="username" class="id">
-        <el-input placeholder="支持QQ号/邮箱/手机号登录" v-model.number="ruleForm.username"></el-input>
+      <el-form-item prop="username" class="id" v-if="!remoteLogin">
+        <el-input placeholder="支持手机号登录" v-model.number="ruleForm.username"></el-input>
       </el-form-item>
-      <el-form-item prop="password" class="psw">
+      <el-form-item prop="bindemail" class="id" v-if="subType == '注册'">
+        <el-input placeholder="请输入绑定的邮箱号" v-model="ruleForm.bindemail"></el-input>
+      </el-form-item>
+      <el-form-item prop="password" class="psw" v-if="!remoteLogin">
         <el-input type="password" placeholder="请输入密码" v-model="ruleForm.password" autocomplete="off" show-password></el-input>
       </el-form-item>
-      <el-form-item prop="checkPass" class="confirmPsw" v-show="subType == '注册'">
+      <el-form-item prop="checkPass" class="confirmPsw" v-if="subType == '注册' && !remoteLogin">
         <el-input type="password" placeholder="请再次输入确认密码" v-model="ruleForm.checkPass" autocomplete="off" show-password></el-input>
       </el-form-item>
-      <el-form-item>
+      <!-- 异地登录邮箱验证 -->
+      <el-form-item prop="bindemail" v-if="remoteLogin">
+        <el-input placeholder="请输入绑定的邮箱号" v-model="ruleForm.bindemail"></el-input>
+      </el-form-item>
+      <el-form-item prop="code" v-if="remoteLogin">
+        <el-input placeholder="请输入验证码" class="verificationCode" v-model.number="ruleForm.verificationCode"></el-input>
+        <el-button class="get-code" @click="getCode('ruleForm')">{{getCodeStatus}}</el-button>
+      </el-form-item>
+      <el-form-item v-if="remoteLogin">
+        <el-button type="success" @click="submitCode()" class="sub-code">提交</el-button>
+      </el-form-item>
+      <el-form-item v-if="!remoteLogin">
         <el-button type="primary" @click="submitForm('ruleForm')">{{subType}}</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
       <div v-if="subType==='登录'">
-        <p class="register">没有账号? <a @click="change">点击创建</a>.</p>
+        <p class="register" v-if="!remoteLogin">没有账号? <a @click="change">点击创建</a>.</p>
       </div>
       <div v-else>
-        <p class="register">已有账号? <a @click="change">立即登录</a>.</p>
+        <p class="register" v-if="!remoteLogin">已有账号? <a @click="change">立即登录</a>.</p>
       </div>
     </el-form>
   </div>
@@ -59,7 +73,7 @@ export default {
         }
       }
     }
-    var validatePass2 = (rule, value, callback) => {
+    var confirmPassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'))
       } else if (value !== this.ruleForm.password) {
@@ -68,35 +82,108 @@ export default {
         callback()
       }
     }
+    var validBindEmail = (rule, value, callback) => {
+      const reg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/
+      if (reg.test(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确邮箱号'))
+      }
+    }
     return {
       subType: '登录',
+      remoteLogin: false,
       ruleForm: {
         password: '',
         checkPass: '',
-        username: ''
+        username: '',
+        email: '',
+        verificationCode: '',
+        bindemail: ''
       },
       rules: {
         password: [
           { validator: validatePass, trigger: 'blur' }
         ],
         checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
+          { validator: confirmPassword, trigger: 'blur' }
         ],
         username: [
           { validator: checkUserName, trigger: 'blur' }
+        ],
+        bindemail: [
+          { validator: validBindEmail, trigger: 'blur' }
         ]
-      }
+      },
+      getCodeStatus: '获取验证码',
+      date: 60
     }
   },
   methods: {
+    submitCode: function () {
+      let formData = {
+        email: this.ruleForm.bindemail,
+        code: this.ruleForm.verificationCode,
+        username: localStorage.username,
+        password: localStorage.password
+      }
+      axios.post('/api/code/postcode', formData)
+        .then(this.getResponse)
+        .catch((err) => {
+          this.$message({
+            message: '请求错误',
+            type: 'error'
+          })
+          console.log(err)
+        })
+    },
+    getCode: function (formName) {
+      this.$refs[formName].validate((valid, fields) => {
+        if (!valid) {
+          return false
+        }
+        if (this.date !== 60) {
+          return
+        }
+        var timer = setInterval(() => {
+          if (this.date === 1) {
+            clearInterval(timer)
+            this.date = 60
+            this.getCodeStatus = '获取验证码'
+            return
+          }
+          this.date--
+          this.getCodeStatus = `${this.date}秒后重试`
+        }, 1000)
+        axios.get('/api/code/getcode', {params: {
+          email: this.ruleForm.bindemail,
+          username: localStorage.username,
+          password: localStorage.password
+        }})
+          .then((res) => {
+            this.$message({
+              message: res.data.message,
+              type: 'error',
+              center: true
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+    },
     sub: function () {
       let url = '/api/user'
       url += this.subType === '登录' ? '/login' : '/register'
+      console.log(localStorage.getItem('positionInfo'))
+      const positionInfo = localStorage.getItem('positionInfo')
       const formData = {
         username: this.ruleForm.username,
-        password: this.ruleForm.password
+        password: this.ruleForm.password,
+        bindemail: this.ruleForm.bindemail,
+        positionInfo: positionInfo
       }
-      debugger
+      console.log(formData)
       axios.post(url, formData)
         .then(this.getResponse, (err) => {
           this.$message({
@@ -105,8 +192,8 @@ export default {
           })
           console.log(err)
         })
-        .catch((a) => {
-          console.log(a)
+        .catch((err) => {
+          console.log(err)
         })
     },
     getResponse: function (res) {
@@ -118,8 +205,18 @@ export default {
           center: true
         })
       } else if (data.errno === 0) {
-        this.clearInput()
+        this.resetForm('ruleForm')
         this.handle(data)
+      } else if (data.errno === 1) {
+        localStorage.setItem('username', this.ruleForm.username)
+        localStorage.setItem('password', this.ruleForm.password)
+        this.resetForm('ruleForm')
+        this.$message({
+          message: data.errorInfo || data.message,
+          type: 'success',
+          center: true
+        })
+        this.remoteLogin = true
       }
     },
     handle: function (data) {
@@ -135,7 +232,7 @@ export default {
             localStorage.isLogin = true
           } else {
             this.subType = '登录'
-            this.clearInput()
+            this.resetForm('ruleForm')
           }
         })
         .catch(action => {
@@ -147,11 +244,13 @@ export default {
     },
     change: function () {
       this.subType = this.subType === '登录' ? '注册' : '登录'
-      this.clearInput()
+      this.resetForm('ruleForm')
     },
     clearInput: function () {
       this.ruleForm.username = ''
       this.ruleForm.password = ''
+      this.remoteLogin = false
+      this.ruleForm.verificationCode = ''
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid, fields) => {
@@ -170,6 +269,7 @@ export default {
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
+      this.ruleForm.verificationCode = ''
     }
   }
 }
@@ -204,6 +304,12 @@ export default {
         margin-bottom: 15px
       .confirmPsw
         margin-bottom: 30px
+      .verificationCode
+        width: 60%
+      .get-code
+        width: 38%
+      .sub-code
+        width: 100%
       p
         color: #ffffff
 </style>

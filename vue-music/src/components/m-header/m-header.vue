@@ -9,7 +9,24 @@
 </template>
 
 <script type="text/ecmascript-6">
-export default {}
+export default {
+  methods: {
+    updateUserInfo: function () {
+      const formData = {
+        favorite: localStorage.getItem('__favorite__'),
+        play: localStorage.getItem('__play__')
+      }
+      console.log(formData)
+      this.$axios.post('/api/user/info', formData)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }
+}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
